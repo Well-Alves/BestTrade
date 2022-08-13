@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head >
+    <meta charset="utf-8">
+    <meta name="viewport">
+
+    <title>{{titulo}} - BestTrade</title>
+  </head>
+
+    <body>
+        <main>
+          <h4>Lista de Usuarios</h4>
+          <table>
+              <thead>
+                  <tr>
+                      <th>Nome</th>
+                      <th>Senha</th>
+                      <th>Email</th>
+                      <th>Editar</th>
+                      <th>Deletar</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for usuario in usuarios %}
+                      <tr>
+                            <td>{{ usuario.user_nome }}</td>
+                            <td>{{ usuario.senha }}</td>
+                            <td>{{ usuario.email }}</td>
+                            <td><a href={{ url_for("user_edit",id=usuario.user_id) }}><img src="../static/img/edit.png" alt="Imagem de um lapiz significando editar" title="Editar" width="25" height="25"></a></td>
+                            <td><a href={{ url_for("user_del",id=usuario.user_id) }}><img src="../static/img/del.png" alt="Imagem de uma borracha significando Apagar/Deletar" title="Deletar" width="25" height="25"></a></td>
+                        </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+        </main>
+
+
+    <footer>BestTrade - Por que deixar juntar poeira se você pode negociar?!</footer>
+    </body>
+</html>

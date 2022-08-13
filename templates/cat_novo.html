@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head >
+    <meta charset="utf-8">
+    <meta name="viewport">
+
+    <title>{{titulo}} - BestTrade</title>
+  </head>
+
+    <body>
+        <main>
+            <div>
+                <form action="/categoria/novo/criar" method="post">
+                    <p><label for="cat_nome">Categoria: *</label></p>
+                    <p><input type="text" id="cat_nome" name="cat_nome"></p>
+                    <p>* = Campos obrigatórios</p> <!-- Vou implementar com bootstrap/JS nas proximas aulas -->
+            
+                     <p><input type="submit" value="Cadastrar"></p>
+                </form>
+            </div>    
+                <br><br>
+            <div>
+                <h4>As Categorias atuais são:</h4>
+          <table>
+              <thead>
+                  <tr>
+                      <th>  Nome  </th>
+                      <th>  Editar  </th>
+                      <th>  Deletar  </th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for cat in cats %}
+                      <tr>
+                          <td>{{ cat.cat_nome }}</td>
+                          <td><a href={{ url_for("cat_edit",id=cat.id) }}><img src="../templates/imgs/edit.png" alt="Editar" width="25" height="25"></a></td>
+                          <td><a href={{ url_for("cat_del",id=cat.id) }}><img src="../templates/imgs/del.png" alt="Deletar" width="25" height="25"></a></td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+        </main>
+        </main>
+
+
+    <footer>BestTrade - Por que deixar juntar poeira se você pode negociar?!</footer>
+    </body>
+</html>
