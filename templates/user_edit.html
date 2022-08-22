@@ -2,52 +2,221 @@
 <html lang="pt-BR">
   <head >
     <meta charset="utf-8">
-    <meta name="viewport">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/static/css/estilos.css" rel="stylesheet">
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
 
     <title>{{titulo}} - BestTrade</title>
   </head>
+  <body class="bg-light text-dark">
+		
+		<header class="p-3 mb-3 border-bottom bg-dark text-light">
+			<div class="visually-hidden visually-hidden-focusable col-12" id="barra_acessibilidade">
+				<ul  id="atalhos">
+				  <li><a href="#navbarNavAltMarkup" accesskey="1">Ir para menu [1]</a></li>
+				  <li><a href="#conteudo" accesskey="2">Ir para Conteudo principal [2]</a></li>
+				</ul>   
+			  </div>  
+			<div class="container">
+			  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+				<a class="navbar-brand" href={{url_for( "index" )}}>
+					<img src="/static/img/logo.png" alt="Logomarca do Site escrito BestTrade" width="67" height="33">
+			  	</a>
+		
+				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+				  <li><a class="nav-link px-2 link-light" href={{url_for( "index" )}}>Home</a></li>
+				  <li><a class="nav-link px-2 link-light" href={{url_for( "anuncios" )}}>Anuncios</a></li>
+				  <li><a class="nav-link px-2 link-light" href={{url_for( "sobre" )}}>Sobre</a></li>
+				</ul>
+		
+				<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+					<input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
+				</form>
+				{% if current_user.is_authenticated %}
+				<div class="dropdown text-end">
+				  <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+					<img src="https://github.com/mdo.png" alt="mdo" width="60" height="60" class="rounded-circle">
+				  </a>
+				  <ul class="dropdown-menu text-small">
+					<li><a class="dropdown-item" id="bvindas" > {{name}}</a></li>
+					<li><a class="dropdown-item" aria-current="page" href={{url_for( "user_edit", id = usuario.user_id )}}><img src="/static/img/op.svg" alt="Engrenagem indicando a opção de sair" width="20" height="20">  Editar Perfil</a></li>
+					<li><a class="dropdown-item" href={{url_for( "meus_anuncios", id = usuario.user_id )}}><img src="/static/img/meus.svg" alt="Desenho de uma lista, representando seus anuncios" width="20" height="20">  Meus anuncios</a></li>
+					<li><a class="dropdown-item" href={{url_for( "lista_favoritos", id = usuario.user_id )}}><img src="/static/img/fav.svg" alt="Coração, simbolizando a Lista de favoritos" width="20" height="20">  Favoritos</a></li>
+					<li><a class="dropdown-item" href={{url_for( "historico_compras", id = usuario.user_id )}}><img src="/static/img/comprados.svg" alt="Desenho de uma lista, representando suas compras" width="20" height="20">  Historico de Compras</a></li>
+					<li><a class="dropdown-item" href={{url_for( "historico_vendas", id = usuario.user_id )}}><img src="/static/img/vendidos.svg" alt="Desenho de uma lista, representando suas vendas" width="20" height="20">  Historico de Vendas</a></li>
+					<li><hr class="dropdown-divider"></li>
+					<li><a class="dropdown-item" href={{url_for( "logout" )}}><img src="/static/img/logout.png" alt="Porta com uma seta de sair" width="20" height="20">  Logout</a></li>
+				  </ul>
+				</div>
+				{% endif %}
+    			{% if not current_user.is_authenticated %}
+				<div class="text-end">
+						<button type="button" class="btn btn-outline-light me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+						  Login
+						</button>
+						<form class="dropdown-menu p-4" action="/login" method="post">
+						  <div class="mb-3">
+							<label for="email" class="form-label">Informe seu Email:</label>
+							<input type="email" class="form-control" id="email" placeholder="email@example.com">
+						</div>
+						  <div class="mb-3">
+							<label for="senha" class="form-label">Senha:</label>
+							<input type="password" class="form-control" id="senha" placeholder="Password">
+						  </div>
+						  <div class="mb-3">
+							<div class="form-check">
+							  <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+							  <label class="form-check-label" for="dropdownCheck2">
+								Lembrar
+							  </label>
+							</div>
+						  </div>
+						  <button type="submit" class="btn btn-primary">Logar</button>
+						</form>
+            <a href={{url_for( "cadastro" )}} class="btn btn-warning" type="button">Sign-up</a>
+				</div>
+				{% endif %}					        
+			  </div>
+			</div>
+      <h2>{{status}}</h2>
+      {% if status == True %}
 
-	<body>
-		<main>
-      <h4>{{titulo}}</h4>
-      <form action="/usuario/detalhes/editar/{{ usuario.id }}" method="post">
-        <p><label for="user_nome">Nome: *</label></p>
-        <p><input type="text" id="user_nome" name="user_nome" value="{{usuario.user_nome}}"></p>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>O perfil foi alterado com sucesso!!!</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+		</header>
 
-        <p><label for="senha">Senha: *</label></p>
-        <p><input type="text" id="senha" name="senha" value="{{usuario.senha}}"></p>       
+  	
+    
+			<main class="container mx-auto mt-1 w-90">
+       
+        
+        <h2 id="formulario">{{titulo}}</h2>
+                <br>
+    
+                <form action="/usuario/detalhes/editar/{{ usuario.user_id }}" method="post" class="needs-validation" novalidate >
+    
+                  <div class="form-row">
+                    <label for="user_nome" class="col-sm-2 col-form-label">Nome: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="user_nome" name="user_nome" value="{{usuario.user_nome}}"  required>
+                      <div class="invalid-feedback">
+                        Campo Nome obrigatório!
+                      </div>
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="email" class="col-sm-2 col-form-label">E-Mail: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="email" class="form-control" id="email" name="email" value="{{usuario.email}}"  required>
+                      <div class="invalid-feedback">
+                        Campo E-Mail obrigatório no formato de email (aaa@aaa.com)!
+                      </div> 
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="cpf" class="col-sm-2 col-form-label">CPF: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="cpf" name="cpf" value="{{usuario.cpf}}"  required>
+                      <div class="invalid-feedback">
+                        Campo CPF Obrigatorio!
+                      </div> 
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="cep" class="col-sm-2 col-form-label">CEP: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="cep" name="cep" value="{{usuario.cep}}" onblur="pesquisacep(this.value);" required>
+                      <div class="invalid-feedback">
+                        Campo CEP obrigatorio
+                      </div> 
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="rua" class="col-sm-2 col-form-label">Rua: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="rua" name="rua" value="{{usuario.rua}}"  required>
+                      <div class="invalid-feedback">
+                        Campo Rua Obrigatorio!
+                      </div> 
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="num" class="col-sm-2 col-form-label">Número: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="num" name="num" value="{{usuario.num}}"  required>
+                      <div class="invalid-feedback">
+                        Campo Número Obrigatorio!
+                      </div> 
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="bairro" class="col-sm-2 col-form-label">Bairro: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="bairro" name="bairro" value="{{usuario.bairro}}" required>
+                      <div class="invalid-feedback">
+                        Campo Bairro Obrigatorio!
+                      </div> 
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="cidade" class="col-sm-2 col-form-label">Cidade: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="cidade" name="cidade" value="{{usuario.cidade}}" required>
+                      <div class="invalid-feedback">
+                        Campo Cidade Obrigatorio!
+                      </div> 
+                    </div>
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="comp" class="col-sm-2 col-form-label">Complemento: </label><br>
+                    <div class="col-sm-10">
+                      <textarea class="form-control" id="comp" name="comp" rows="4" value="{{usuario.comp}}"></textarea>
+                    </div> 
+                  </div>
+                  <br>
+                  <div class="form-row">
+                    <label for="estado" class="col-sm-2 col-form-label">Estado: *</label><br>
+                    <div class="col-sm-10">
+                      <input type="text" class="form-control" id="estado" name="estado" value="{{usuario.estado}}"  required>
+                      <div class="invalid-feedback">
+                        Campo Estado Obrigatorio!
+                      </div>
+                      <p class="cinza_claro">* Campos obrigatórios</p> 
+                    </div>
+                  </div>
+                  <div class="center">
+                    <button type="submit" class="btn btn-primary my-1">Salvar</button>
+                    <a href={{url_for( "index" )}}>
+                      <input type="button" class="btn btn-primary my-1" value="Cancelar">
+                    </a>  
+                  </div>
+                </form>
+      </main>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
 
-        <p><label for="email">E-mail: *</label></p>
-        <p><input type="email" id="email" name="email" value="{{usuario.email}}"></p>
-
-        <p><label for="cpf">CPF: *</label></p>
-        <p><input type="text" id="cpf" name="cpf" value="{{usuario.cpf}}"></p>
-
-        <p><label for="cep">CEP: *</label></p>
-        <p><input type="text" id="cep" name="cep" value="{{usuario.cep}}"></p> 
-
-        <p><label for="rua">Endereço: *</label></p>
-        <p><input type="text" id="rua" name="rua" value="{{usuario.rua}}"></p>
-
-        <p><label for="num">Número: *</label></p>
-        <p><input type="text" id="num" name="num" value="{{usuario.num}}"></p>
-
-        <p><label for="bairro">Bairro: *</label></p>
-        <p><input type="text" id="bairro" name="bairro" value="{{usuario.bairro}}"></p>
-
-        <p><label for="cidade">Cidade: *</label></p>
-        <p><input type="text" id="cidade" name="cidade" value="{{usuario.cidade}}"></p>
-
-        <p><label for="comp">Complemento:</label></p>
-        <p><input type="text" id="comp" name="comp" value="{{usuario.comp}}"></p>
-
-        <p><label for="estado">Estado: *</label></p>
-        <p><input type="text" id="estado" name="estado" value="{{usuario.estado}}"></p>
-
-        <p><input type="submit" value="Salvar"></p>
-      </form>
-      <a href={{url_for("list_users")}}> Cancelar</a>
-    </main>
-    <footer>BestTrade - Por que deixar juntar poeira se você pode negociar?!</footer>
+			<footer class="row bg-dark bg-gradient text-light text-start">
+	      <div class="container mx-auto mt-1 w-90 col-12">
+	        <p><br>&emsp; Copyright © 2022 - Wellington Alves</p>
+	      </div>
+	    </footer>
+	    <script src="/static/js/script.js"></script>
+	    <script src="/static/js/bootstrap.bundle.js"></script>
+		
   </body>
 </html>
+

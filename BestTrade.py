@@ -1,3 +1,4 @@
+from crypt import methods
 from flask import Flask, make_response
 from markupsafe import escape
 from flask import render_template
@@ -5,21 +6,29 @@ from flask import request
 from flask_sqlalchemy import SQLAlchemy
 from flask import url_for
 from flask import redirect
-
+from flask_login import (current_user, LoginManager, login_user, logout_user, login_required)
+import hashlib
+from datetime import datetime
 
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://well:123456@localhost:3306/BestTrade"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
+app.secret_key = "@123"
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 db = SQLAlchemy(app)
+
+
 
 class Usuario(db.Model):
     __tablename__ = "usuario"
     user_id = db.Column("user_id", db.Integer, primary_key = True)
     user_nome = db.Column("user_nome", db.String(100), nullable=False)
-    senha = db.Column("senha", db.String(100), nullable=False)
+    senha = db.Column("senha", db.String(300), nullable=False)
     email = db.Column("email", db.String(100), nullable=False)
     cpf = db.Column("cpf", db.String(100), nullable=False)
     cep = db.Column("cep", db.String(100), nullable=False)
@@ -43,13 +52,25 @@ class Usuario(db.Model):
         self.comp = comp
         self.estado = estado
 
+    def is_authenticated(self):
+        return True
+
+    def is_active(self):
+        return True
+
+    def is_anonymous(self):
+        return False
+
+    def get_id(self):
+        return str(self.user_id)
+
 class Categoria(db.Model):
     __tablename__ = "cat"
     cat_id  = db.Column("cat_id", db.Integer, primary_key = True)
     cat_nome = db.Column("cat_nome", db.String(100), nullable=False)
 
-    def __init__(self,produto_id_c, nome_cat):
-        self.nome_cat = nome_cat
+    def __init__(self, cat_nome):
+        self.cat_nome = cat_nome
 
 class Produto(db.Model):
     __tablename__ = "produto"
@@ -59,27 +80,29 @@ class Produto(db.Model):
     qtd = db.Column("qtd", db.Integer, nullable=False)
     valor= db.Column("valor", db.Float, nullable=False)
     cat_id_anun = db.Column("cat_id", db.ForeignKey("cat.cat_id"), nullable=False)
+    user_id = db.Column("user_id", db.ForeignKey("usuario.user_id"), nullable=False)
+    data_anun = db.Column("data_anun", db.DATETIME)
 
-    def __init__(self, prod_nome, descricao, qtd, valor, cat_id_anun):
+
+    def __init__(self, prod_nome, descricao, qtd, valor, cat_id_anun, user_id, data_anun):
         self.prod_nome = prod_nome
         self.descricao = descricao
-        self.qdt = qtd
+        self.qtd = qtd
         self.valor = valor
         self.cat_id_anun = cat_id_anun
-
-    
-class Anuncio(db.Model):
-    __tablename__ = "anuncio"
-    anuncio_id  = db.Column("anun_id", db.Integer, primary_key = True)
-    produto_id = db.Column("prod_id", db.ForeignKey("produto.prod_id"), nullable=False)
-    vendedor_id = db.Column("info", db.ForeignKey("usuario.user_id"), nullable=False)
-    data_anun = db.Column("d_anun", db.DateTime)
-
-
-    def __init__(self, produto_id, vendedor_id, data_anun):
-        self.produto_id = produto_id
-        self.vendedor_id = vendedor_id
+        self.user_id = user_id
         self.data_anun = data_anun
+
+
+class Favoritos(db.Model):
+    __tablename__ = "favoritos"
+    fav_id = db.Column("fav_id", db.Integer, primary_key = True)
+    fav_anun = db.Column("fav_anun", db.ForeignKey("produto.prod_id"), nullable=False)
+    fav_user = db.Column("fav_user", db.ForeignKey("usuario.user_id"), nullable=False)
+
+    def __init__(self, fav_anun, fav_user):
+        self.fav_anun = fav_anun
+        self.fav_user = fav_user
 
 class Transacao(db.Model):
     __tablename__ = "trades"
@@ -95,126 +118,240 @@ class Transacao(db.Model):
 
 class Mensagens(db.Model):
     __tablename__ = "mensagens"
-    id_msg = db.Column("msg_id", db.Integer, primary_key = True)
+    msg_id = db.Column("msg_id", db.Integer, primary_key = True)
     msg = db.Column("msg", db.Text, nullable=False)
-    anun_id = db.Column("anun_id", db.ForeignKey("anuncio.anun_id"), nullable=False)
-
-    def __init__(self, msg, anun_id):
+    anun_id = db.Column("anun_id", db.ForeignKey("produto.prod_id"), nullable=True)
+    nome = db.Column("nome", db.String(100), nullable=False)
+    data_msg = db.Column("data_msg", db.DateTime)
+    
+    def __init__(self, msg, anun_id, nome, data_msg):
         self.msg = msg
         self.anun_id = anun_id
+        self.nome = nome
+        self.data_msg = data_msg
+        
 
+class Respostas(db.Model):
+    __tablename__ = "respostas"
+    resp_id = db.Column("resp_id", db.Integer, primary_key = True)
+    resp = db.Column("resp", db.Text, nullable = False)
+    resp_to = db.Column("resp_to", db.ForeignKey("mensagens.msg_id"), nullable=False)
+    anun_id = db.Column("anun_id", db.ForeignKey("produto.prod_id"), nullable=False)
+    nome = db.Column("nome", db.String(100), nullable=False)
+    data_resp = db.Column("data_resp", db.DateTime)
 
+    def __init__(self, resp, resp_to, anun_id, nome, data_resp):
+        self.resp = resp
+        self.resp_to= resp_to
+        self.anun_id = anun_id
+        self.nome = nome
+        self.data_resp = data_resp
+
+@app.errorhandler(404)
+def pag_erro(error):
+    return render_template("ops.html")
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Usuario.query.get(user_id)
  
 @app.route("/")
 def index():
-    return render_template("index.html", titulo="Home")
-   
     
+    if current_user.is_authenticated:       
+        return render_template("index.html", titulo="Home", name = current_user.user_nome)
+    else:
+        return render_template("index.html", titulo="Home", usuario = Usuario.query.all())
+   
+@app.route("/login", methods=["GET","POST"])
+def login():
+    if request.method == "POST":
+        email = request.form.get("email")
+        senha = hashlib.sha512(str(request.form.get("senha")).encode("utf-8")).hexdigest()
+        user = Usuario.query.filter_by(email=email, senha=senha).first()
+
+        if user:
+            login_user(user)
+            return redirect(url_for("index"))
+        else:
+            return redirect(url_for("index"))
+    return redirect(url_for("index"))
+    
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("index"))
+    
+
 @app.route("/usuario/novo")
 def cadastro():
     return render_template("cadastro.html", titulo="Cadastro de Usuario")
 
 @app.route("/usuario/detalhes")
+@login_required
 def list_users():
     return render_template("list_users.html", usuarios = Usuario.query.all(), titulo="Lista de usuarios cadastrados")
 
 @app.route("/usuario/detalhes/editar/<int:id>", methods=["GET","POST"])
+@login_required
 def user_edit(id):
     usuario = Usuario.query.get(id)
     if request.method == "POST":
         usuario.user_nome = request.form.get("user_nome")
-        usuario.senha = request.form.get("senha")
         usuario.email = request.form.get("email")
         usuario.cpf = request.form.get("cpf")
         usuario.cep = request.form.get("cep")
         usuario.rua = request.form.get("rua")
-        usuario.num = request.form.get("numero")
+        usuario.num = request.form.get("num")
         usuario.bairro = request.form.get("bairro")
         usuario.cidade = request.form.get("cidade")
+        usuario.comp = request.form.get("comp")
         usuario.estado = request.form.get("estado")
         db.session.add(usuario)
         db.session.commit()
-        return redirect(url_for("list_users"))
+        return redirect(url_for( "user_edit", id = usuario.user_id))
 
     return render_template("user_edit.html", usuario = usuario , titulo="Edição de Usuario")
 
+
 @app.route("/usuario/detalhes/remover/<int:id>")
+@login_required
 def user_del(id):
     usuario = Usuario.query.get(id)
     db.session.delete(usuario)
     db.session.commit()
     return redirect(url_for('usuario'))   
 
+@app.route("/anuncio/detalhes/<int:id>")
+@login_required
+def anun_info(id):
+    favs = Favoritos.query.all()
+    anun = Produto.query.get(id)
+    info = anun
+    conta = 0
+    for fav in favs:
+        if (fav.fav_anun == info.prod_id) and (fav.fav_user == current_user.user_id):
+            conta = conta +1
+    if conta == 0:
+        stt = 1
+    else:
+        stt = 0
+    print(stt)  
+    return render_template("anuncios_info.html", info = anun, stt = stt, favs = Favoritos.query.all(), resps = Respostas.query.all(), msgs = Mensagens.query.all(), titulo = "detalhes do produto")
+
 @app.route("/anuncio")
-def produtos():
-    return render_template("anuncios.html")
+def anuncios():
+    return render_template("anuncios.html", produtos = Produto.query.all(), titulo = "Lista de anuncios")
 
 @app.route("/anuncio/novo")
+@login_required
 def novo_anuncio():
-    return render_template("novo_anun.html")
+    return render_template("novo_anun.html", categorias = Categoria.query.all(), titulo = "Criar novo anuncio")
 
 @app.route("/anuncios/meus")
+@login_required
 def meus_anuncios():
     return render_template("meus_anuncios.html")   
 
 @app.route("/anuncios/meus/del")
+@login_required
 def remover_anuncio():
     return
 
-@app.route("/favoritos/lista")
+@app.route("/usuario/favoritos/lista")
+@login_required
 def lista_favoritos():
     return render_template("favoritos.html")  
 
-@app.route("/hist/compras") 
+@app.route("/hist/compras")
+@login_required 
 def historico_compras():
     return render_template("hist_compras.html") 
 
 @app.route("/hist/vendas")
+@login_required
 def historico_vendas():
     return render_template("hist_vendas.html")
 
 @app.route("/usuario/novo/criar", methods=['POST'])
 def cad_user():
-    usuario = Usuario(request.form.get("user_nome"), request.form.get("senha"), request.form.get("email"), request.form.get("cpf"), request.form.get("cep"), request.form.get("rua"), request.form.get("num"), request.form.get("bairro"), request.form.get("cidade"), request.form.get("comp"), request.form.get("estado"))
+    hash = hashlib.sha512(str(request.form.get("senha")).encode("utf-8")).hexdigest()
+    usuario = Usuario(request.form.get("user_nome"), hash, request.form.get("email"), request.form.get("cpf"), request.form.get("cep"), request.form.get("rua"), request.form.get("num"), request.form.get("bairro"), request.form.get("cidade"), request.form.get("comp"), request.form.get("estado"))
     db.session.add(usuario)
     db.session.commit()
     return redirect(url_for("cadastro"))
 
-@app.route("/anuncio/novo/criar", methods=['POST'])
+@app.route("/anuncio/novo/criar", methods=["POST"])
+@login_required
 def cad_novo_anun():
-    novo_anun = Produto(request.form.get("prod_nome"), request.form.get("info"), request.form.get("qdt"), request.form.get("valor"), request.form.get("cat_id"))
+    user_id = current_user.user_id
+    dat = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
+    novo_anun = Produto(request.form.get("prod_nome"), request.form.get("descricao"), request.form.get("qtd"), request.form.get("valor"), request.form.get("cat_id_anun"), user_id, dat)
     db.session.add(novo_anun)
     db.session.commit()
     return redirect(url_for("novo_anuncio"))
 
+@app.route("/anuncio/msg/criar", methods=["POST"])
+@login_required
+def msg_novo():
+    user_nome = current_user.user_nome
+    dat = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    nova_msg = Mensagens(request.form.get("msg"), request.form.get("anun_id"), user_nome, dat)
+    db.session.add(nova_msg)
+    db.session.commit()
+    return redirect(url_for("anun_info",id = nova_msg.anun_id ))
 
+@app.route("/anuncio/msg/resp", methods=["POST"])
+@login_required
+def msg_resp():
+    user_nome = current_user.user_nome
+    dat = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    resp_msg = request.form.get("anun_id")
+    nova_msg = Respostas(request.form.get("resp"), request.form.get("resp_to"), request.form.get("anun_id"), user_nome, dat )
+    db.session.add(nova_msg)
+    db.session.commit()
+    return redirect(url_for("anun_info",id = resp_msg))
 
-@app.route("/perguntas")
-def perguntas():
-    return
+app.route("/anuncio/favoritos/novo", methods=["POST"])
+@login_required
+def novo_fav():
+    user_id = current_user.user_id
+    novo_fav = Favoritos(request.form.get("fav"), user_id)
+    print(novo_fav)
+    db.session.add(novo_fav)
+    db.session.commit()
+    return redirect(url_for("anun_info",id = novo_fav.fav_anun))
+
+        
+
+@app.route("/sobre")
+def sobre():
+    return render_template("sobre.html") 
 
 @app.route("/compra")
+@login_required
 def compra():
     return
 
 @app.route("/favorito")
+@login_required
 def fav():
     return
 
-
-@app.route("/login")
-def login():
-    return
 
 @app.route("/busca")
 def busca():
     return
 
 @app.route("/categoria/novo")
+@login_required
 def cat_novo():
     return render_template("cat_novo.html", cats = Categoria.query.all(), titulo = "Nova Categoria")
 
 @app.route("/categoria/criar", methods=["POST"])
+@login_required
 def cat_criar():
     cat = Categoria(request.form.get("cat_nome"))
     db.session.add(cat)
@@ -222,15 +359,16 @@ def cat_criar():
     return redirect(url_for("cat_novo"))
 
 @app.route("/categoria/del")
+@login_required
 def cat_del():
     return
 
 @app.route("/categoria/edit")
+@login_required
 def cat_edit():
     return
+
+
 if __name__ == 'BestTrade':
     db.create_all()
 
-@app.errorhandler(404)
-def pag_erro(error):
-    return render_template("ops.html")
