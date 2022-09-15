@@ -107,13 +107,15 @@ class Favoritos(db.Model):
 class Transacao(db.Model):
     __tablename__ = "trades"
     trade_id  = db.Column("trade_id", db.Integer, primary_key = True)
-    anun_id = db.Column("anun_id", db.ForeignKey("anuncio.anun_id"), nullable=False)
-    vendedor_id_anun = db.Column("v_id", db.ForeignKey("usuario.user_id"), nullable=False)
+    anun_id = db.Column("anun_id", db.ForeignKey("produto.prod_id"), nullable=False)
+    vendedor_id = db.Column("v_id", db.ForeignKey("produto.user_id"), nullable=False)
+    comprador_id = db.Column("c_id", db.ForeignKey("usuario.user_id"), nullable=False)
     data_trade = db.Column("d_trade", db.DateTime)
 
-    def __init__(self, anun_id, vendedor_id_anun, data_trade):
+    def __init__(self, anun_id, vendedor_id, comprador_id, data_trade):
         self.anun_id = anun_id
-        self.vendedor_id_anun = vendedor_id_anun
+        self.vendedor_id = vendedor_id
+        self.comprador_id = comprador_id
         self.data_trade = data_trade
 
 class Mensagens(db.Model):
@@ -238,7 +240,6 @@ def anun_info(id):
         stt = 1
     else:
         stt = 0
-    print(stt)  
     return render_template("anuncios_info.html", info = anun, stt = stt, favs = Favoritos.query.all(), resps = Respostas.query.all(), msgs = Mensagens.query.all(), titulo = "detalhes do produto")
 
 @app.route("/anuncio")
@@ -314,15 +315,16 @@ def msg_resp():
     db.session.commit()
     return redirect(url_for("anun_info",id = resp_msg))
 
-app.route("/anuncio/favoritos/novo", methods=["POST"])
+@app.route("/anuncio/favoritos/novo", methods=["POST"])
 @login_required
 def novo_fav():
     user_id = current_user.user_id
-    novo_fav = Favoritos(request.form.get("fav"), user_id)
+    fav_id = request.form.get("fav")
+    novo_fav = Favoritos(fav_id, user_id)
     print(novo_fav)
     db.session.add(novo_fav)
     db.session.commit()
-    return redirect(url_for("anun_info",id = novo_fav.fav_anun))
+    return redirect(url_for("anun_info",id = fav_id))
 
         
 
@@ -330,10 +332,35 @@ def novo_fav():
 def sobre():
     return render_template("sobre.html") 
 
-@app.route("/compra")
+@app.route("/anuncio/compra", methods=["POST"])
 @login_required
-def compra():
-    return
+def conf_compra():
+    qtd = int(request.form.get("qtd_compra"))
+    prod = request.form.get("prod_id")
+    aux = Produto.query.get(prod)
+    aux2 = aux.valor
+    total = aux2 * qtd
+
+    return render_template("comprar.html", info = aux, qtd = qtd, total = total, titulo = "Confirmação de Compra")
+
+@app.route("/anuncio/compra/confirma", methods=["POST"])
+@login_required
+def comprado():
+    comprador = current_user.user_id
+    dat = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
+    v_id = request.form.get("v_id")
+    print(v_id)
+    trade = Transacao(request.form.get("prod_id"), request.form.get("v_id"), comprador, dat)
+    db.session.add(trade)
+    db.session.commit()
+    qtd = int(request.form.get("qtd"))
+    prod_id = request.form.get("prod_id")
+    prod = Produto.query.get(prod_id)
+    prod.qtd = prod.qtd - qtd
+    db.session.commit()
+    aux = Produto.query.get(prod_id)
+    total = aux.valor * qtd
+    return render_template("comprado.html", info = aux, qtd = qtd, total = total, titulo = "Compra realizada")
 
 @app.route("/favorito")
 @login_required

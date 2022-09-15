@@ -132,9 +132,11 @@
                       <div class="col-md-6">
                         <label for="qtd" class="form-label">Quantos {{info.prod_nome }}, deseja comprar:</label>
                         <input type="number" min="1" max={{info.qtd}} class="form-control" id="qtd_compra" name="qtd_compra">
+                        <label for="prod_id" class="form-label"></label>
+                        <input type="hidden" name="prod_id" value={{info.prod_id}}>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>.
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn btn-primary">Continuar</button>
                       </div>
                     </form>
@@ -142,18 +144,17 @@
                 </div>
               </div>
             </div>
-            <br>          
-              <a class="btn btn-primary" data-bs-toggle="modal" href="#exampleModalToggle" role="button">Comprar</a>
+            <br>
+            <div>
+              <a class="btn btn-primary mb-2" data-bs-toggle="modal" href="#exampleModalToggle" role="button">Comprar</a>
               {% if stt == 1 %}
-                <form action="/anuncio/favoritos/novo" method="post">
-                  <button type="submit" class="btn btn-outline-danger"  name="fav" value={{info.prod_id}}>Favoritar</button>
+                <form class="form-inline" action="/anuncio/favoritos/novo" method="post">
+                  <button type="submit" class="btn btn-outline-danger mb-2"  name="fav" value={{info.prod_id}}>Favoritar</button>
                 </form>
               {% else %}
-                  <form action="/anuncio/favoritos/novo" method="post">
-                    <button type="submit" class="btn btn-outline-danger"  name="fav" value={{info.prod_id}} disabled>Favoritar</button>
-                  </form>
+                    <button type="button" class="btn btn-outline-danger mb-2"  name="fav" value={{info.prod_id}} disabled>Favoritar</button>
               {% endif %}
-          
+            </div>
         </main>
         <section class="container mx-auto mt-1 w-75">
             <br>
