@@ -82,9 +82,10 @@ class Produto(db.Model):
     cat_id_anun = db.Column("cat_id", db.ForeignKey("cat.cat_id"), nullable=False)
     user_id = db.Column("user_id", db.ForeignKey("usuario.user_id"), nullable=False)
     data_anun = db.Column("data_anun", db.DATETIME)
+    prod_stt = db.Column("prod_stt", db.Integer)
 
 
-    def __init__(self, prod_nome, descricao, qtd, valor, cat_id_anun, user_id, data_anun):
+    def __init__(self, prod_nome, descricao, qtd, valor, cat_id_anun, user_id, data_anun, prod_stt):
         self.prod_nome = prod_nome
         self.descricao = descricao
         self.qtd = qtd
@@ -92,6 +93,7 @@ class Produto(db.Model):
         self.cat_id_anun = cat_id_anun
         self.user_id = user_id
         self.data_anun = data_anun
+        self.prod_stt = prod_stt
 
 
 class Favoritos(db.Model):
@@ -254,11 +256,20 @@ def novo_anuncio():
 @app.route("/anuncios/meus")
 @login_required
 def meus_anuncios():
-    return render_template("meus_anuncios.html")   
+    return render_template("meus_anun.html", cats = Categoria.query.all(), anuns = Produto.query.all(), titulo = "Meus Anuncios")   
 
-@app.route("/anuncios/meus/del")
+@app.route("/anuncios/meus/del/<int:id>")
 @login_required
-def remover_anuncio():
+def anun_del(id):
+    anun = Produto.query.get(id)
+    anun.prod_stt = 1
+    db.session.commit()
+    return redirect(url_for('meus_anuncios'))
+
+
+@app.route("/anuncios/meus/edit")
+@login_required
+def anun_edit():
     return
 
 @app.route("/usuario/favoritos/lista")
@@ -385,15 +396,15 @@ def cat_criar():
     db.session.commit()
     return redirect(url_for("cat_novo"))
 
-@app.route("/categoria/del")
+@app.route("/categoria/del/<int:id>")
 @login_required
-def cat_del():
-    return
+def cat_del(id):
+    cat = Categoria.query.get(id)
+    db.session.delete(cat)
+    db.session.commit()
+    return redirect(url_for('cat_novo'))
+    
 
-@app.route("/categoria/edit")
-@login_required
-def cat_edit():
-    return
 
 
 if __name__ == 'BestTrade':

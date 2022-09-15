@@ -24,9 +24,23 @@
 			  	</a>
 		
 				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-				  <li><a class="nav-link px-2 link-light" href={{url_for( "index" )}}>Home</a></li>
+				  <li><a class="nav-link px-2 link-secondary" aria-current="page" href={{url_for( "index" )}}>Home<span class="visually-hidden">(Página atual)</span></a></li>
 				  <li><a class="nav-link px-2 link-light" href={{url_for( "anuncios" )}}>Anuncios</a></li>
 				  <li><a class="nav-link px-2 link-light" href={{url_for( "sobre" )}}>Sobre</a></li>
+				  {% if current_user.user_id == 4 %}
+				  <li class="nav-item dropdown">
+					<a class="nav-link px-2 link-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					  Admin
+					</a>
+					<ul class="dropdown-menu">
+					  <li><a class="dropdown-item" href={{ url_for("cat_novo") }}>Categorias</a></li>
+					  <li><a class="dropdown-item" href={{ url_for("list_users") }}>Lista de Usuarios Cadastrados</a></li>
+
+					  <li><hr class="dropdown-divider"></li>
+					  <li><a class="dropdown-item disabled" href="#">Menu Adminstrativo</a></li>
+					</ul>
+				  </li>
+				  {% endif %}
 				</ul>
 		
 				<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
@@ -38,12 +52,15 @@
 					<img src="/static/img/icon.png" alt="mdo" width="60" height="60" class="rounded-circle">
 				  </a>
 				  <ul class="dropdown-menu text-small">
-					<li><a class="dropdown-item" id="bvindas" > {{name}}</a></li>
-					<li><a class="dropdown-item" href={{url_for( "user_edit", id = usuario.user_id )}}><img src="/static/img/op.svg" alt="Engrenagem indicando a opção de sair" width="20" height="20">  Editar Perfil</a></li>
-					<li><a class="dropdown-item" href={{url_for( "meus_anuncios", id = usuario.user_id )}}><img src="/static/img/meus.svg" alt="Desenho de uma lista, representando seus anuncios" width="20" height="20">  Meus anuncios</a></li>
-					<li><a class="dropdown-item" href={{url_for( "lista_favoritos", id = usuario.user_id )}}><img src="/static/img/fav.svg" alt="Coração, simbolizando a Lista de favoritos" width="20" height="20">  Favoritos</a></li>
-					<li><a class="dropdown-item" href={{url_for( "historico_compras", id = usuario.user_id )}}><img src="/static/img/comprados.svg" alt="Desenho de uma lista, representando suas compras" width="20" height="20">  Historico de Compras</a></li>
-					<li><a class="dropdown-item" href={{url_for( "historico_vendas", id = usuario.user_id )}}><img src="/static/img/vendidos.svg" alt="Desenho de uma lista, representando suas vendas" width="20" height="20">  Historico de Vendas</a></li>
+					<li><a class="dropdown-item" id="bvindas"></a></li>
+					<li><a class="dropdown-item">{{name}}</a></li>
+					<li><hr class="dropdown-divider"></li>
+					<li><a class="dropdown-item" href={{ url_for("user_edit",id = current_user.user_id) }}><img src="/static/img/op.svg" alt="Engrenagem indicando a opção de sair" width="20" height="20">  Editar Perfil</a></li>
+					<li><a class="dropdown-item" href={{ url_for("meus_anuncios",id = current_user.user_id) }}><img src="/static/img/meus.svg" alt="Desenho de uma lista, representando seus anuncios" width="20" height="20">  Meus anuncios</a></li>
+					<li><a class="dropdown-item" href={{ url_for("novo_anuncio",id = current_user.user_id) }}><img src="/static/img/new.svg" alt="Desenho de um sinal de mais, representando criar novo anuncio" width="20" height="20">  Criar Anuncio</a></li>
+					<li><a class="dropdown-item" href={{ url_for("lista_favoritos",id = current_user.user_id) }}><img src="/static/img/fav.svg" alt="Coração, simbolizando a Lista de favoritos" width="20" height="20">  Favoritos</a></li>
+					<li><a class="dropdown-item" href={{ url_for("historico_compras",id = current_user.user_id) }}><img src="/static/img/comprados.svg" alt="Desenho de uma lista, representando suas compras" width="20" height="20">  Historico de Compras</a></li>
+					<li><a class="dropdown-item" href={{ url_for("historico_vendas",id = current_user.user_id) }}><img src="/static/img/vendidos.svg" alt="Desenho de uma lista, representando suas vendas" width="20" height="20">  Historico de Vendas</a></li>
 					<li><hr class="dropdown-divider"></li>
 					<li><a class="dropdown-item" href={{url_for( "logout" )}}><img src="/static/img/logout.png" alt="Porta com uma seta de sair" width="20" height="20">  Logout</a></li>
 				  </ul>
@@ -57,11 +74,11 @@
 						<form class="dropdown-menu p-4" action="/login" method="post">
 						  <div class="mb-3">
 							<label for="email" class="form-label">Informe seu Email:</label>
-							<input type="email" class="form-control" id="email" placeholder="email@example.com">
+							<input type="email" class="form-control" id="email" name="email" placeholder="email@example.com">
 						</div>
 						  <div class="mb-3">
 							<label for="senha" class="form-label">Senha:</label>
-							<input type="password" class="form-control" id="senha" placeholder="Password">
+							<input type="password" class="form-control" id="senha" name="senha" placeholder="Password">
 						  </div>
 						  <div class="mb-3">
 							<div class="form-check">
@@ -73,12 +90,13 @@
 						  </div>
 						  <button type="submit" class="btn btn-primary">Logar</button>
 						</form>
-            <a href={{url_for( "cadastro" )}} class="btn btn-warning" type="button">Sign-up</a>
-				</div>
+					<a href={{url_for( "cadastro" )}} class="btn btn-warning" type="button">Sign-up</a>
+
+					</div>
 				{% endif %}					        
 			  </div>
 			</div>
-		</header>
+		  </header>
 
   	
 			<main class="container mx-auto mt-1 w-90">

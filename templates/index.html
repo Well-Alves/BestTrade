@@ -27,6 +27,20 @@
 				  <li><a class="nav-link px-2 link-secondary" aria-current="page" href={{url_for( "index" )}}>Home<span class="visually-hidden">(Página atual)</span></a></li>
 				  <li><a class="nav-link px-2 link-light" href={{url_for( "anuncios" )}}>Anuncios</a></li>
 				  <li><a class="nav-link px-2 link-light" href={{url_for( "sobre" )}}>Sobre</a></li>
+				  {% if current_user.user_id == 4 %}
+				  <li class="nav-item dropdown">
+					<a class="nav-link px-2 link-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					  Admin
+					</a>
+					<ul class="dropdown-menu">
+					  <li><a class="dropdown-item" href={{ url_for("cat_novo") }}>Categorias</a></li>
+					  <li><a class="dropdown-item" href={{ url_for("list_users") }}>Lista de Usuarios Cadastrados</a></li>
+
+					  <li><hr class="dropdown-divider"></li>
+					  <li><a class="dropdown-item disabled" href="#">Menu Adminstrativo</a></li>
+					</ul>
+				  </li>
+				  {% endif %}
 				</ul>
 		
 				<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
@@ -43,6 +57,7 @@
 					<li><hr class="dropdown-divider"></li>
 					<li><a class="dropdown-item" href={{ url_for("user_edit",id = current_user.user_id) }}><img src="/static/img/op.svg" alt="Engrenagem indicando a opção de sair" width="20" height="20">  Editar Perfil</a></li>
 					<li><a class="dropdown-item" href={{ url_for("meus_anuncios",id = current_user.user_id) }}><img src="/static/img/meus.svg" alt="Desenho de uma lista, representando seus anuncios" width="20" height="20">  Meus anuncios</a></li>
+					<li><a class="dropdown-item" href={{ url_for("novo_anuncio",id = current_user.user_id) }}><img src="/static/img/new.svg" alt="Desenho de um sinal de mais, representando criar novo anuncio" width="20" height="20">  Criar Anuncio</a></li>
 					<li><a class="dropdown-item" href={{ url_for("lista_favoritos",id = current_user.user_id) }}><img src="/static/img/fav.svg" alt="Coração, simbolizando a Lista de favoritos" width="20" height="20">  Favoritos</a></li>
 					<li><a class="dropdown-item" href={{ url_for("historico_compras",id = current_user.user_id) }}><img src="/static/img/comprados.svg" alt="Desenho de uma lista, representando suas compras" width="20" height="20">  Historico de Compras</a></li>
 					<li><a class="dropdown-item" href={{ url_for("historico_vendas",id = current_user.user_id) }}><img src="/static/img/vendidos.svg" alt="Desenho de uma lista, representando suas vendas" width="20" height="20">  Historico de Vendas</a></li>

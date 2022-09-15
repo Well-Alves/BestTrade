@@ -9,79 +9,94 @@
     <title>{{titulo}} - BestTrade</title>
   </head>
   <body class="bg-light text-dark">
-    
-    <header class="p-3 mb-3 border-bottom bg-dark text-light">
-      <div class="visually-hidden visually-hidden-focusable col-12" id="barra_acessibilidade">
-        <ul  id="atalhos">
-          <li><a href="#navbarNavAltMarkup" accesskey="1">Ir para menu [1]</a></li>
-          <li><a href="#conteudo" accesskey="2">Ir para Conteudo principal [2]</a></li>
-        </ul>   
-        </div>  
-      <div class="container">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a class="navbar-brand" href={{url_for( "index" )}}>
-          <img src="/static/img/logo.png" alt="Logomarca do Site escrito BestTrade" width="67" height="33">
-          </a>
-    
-        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><a class="nav-link px-2 link-light" href={{url_for( "index" )}}>Home</a></li>
-          <li><a class="nav-link px-2 link-light" href={{url_for( "anuncios" )}}>Anuncios</a></li>
-          <li><a class="nav-link px-2 link-light" href={{url_for( "sobre" )}}>Sobre</a></li>
-        </ul>
-    
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
-          <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
-        </form>
-        {% if current_user.is_authenticated %}
-        <div class="dropdown text-end">
-          <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-          <img src="/static/img/icon.png" alt="mdo" width="60" height="60" class="rounded-circle">
-          </a>
-          <ul class="dropdown-menu text-small">
-          <li><a class="dropdown-item" id="bvindas"></a></li>
-          <li><a class="dropdown-item">{{name}}</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href={{ url_for("user_edit",id = current_user.user_id) }}><img src="/static/img/op.svg" alt="Engrenagem indicando a opção de sair" width="20" height="20">  Editar Perfil</a></li>
-          <li><a class="dropdown-item" href={{ url_for("meus_anuncios",id = current_user.user_id) }}><img src="/static/img/meus.svg" alt="Desenho de uma lista, representando seus anuncios" width="20" height="20">  Meus anuncios</a></li>
-          <li><a class="dropdown-item" href={{ url_for("lista_favoritos",id = current_user.user_id) }}><img src="/static/img/fav.svg" alt="Coração, simbolizando a Lista de favoritos" width="20" height="20">  Favoritos</a></li>
-          <li><a class="dropdown-item" href={{ url_for("historico_compras",id = current_user.user_id) }}><img src="/static/img/comprados.svg" alt="Desenho de uma lista, representando suas compras" width="20" height="20">  Historico de Compras</a></li>
-          <li><a class="dropdown-item" href={{ url_for("historico_vendas",id = current_user.user_id) }}><img src="/static/img/vendidos.svg" alt="Desenho de uma lista, representando suas vendas" width="20" height="20">  Historico de Vendas</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href={{url_for( "logout" )}}><img src="/static/img/logout.png" alt="Porta com uma seta de sair" width="20" height="20">  Logout</a></li>
-          </ul>
-        </div>
-        {% endif %}
-          {% if not current_user.is_authenticated %}
-        <div class="text-end">
-            <button type="button" class="btn btn-outline-light me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
-              Login
-            </button>
-            <form class="dropdown-menu p-4" action="/login" method="post">
-              <div class="mb-3">
-              <label for="email" class="form-label">Informe seu Email:</label>
-              <input type="email" class="form-control" id="email" name="email" placeholder="email@example.com">
-            </div>
-              <div class="mb-3">
-              <label for="senha" class="form-label">Senha:</label>
-              <input type="password" class="form-control" id="senha" name="senha" placeholder="Password">
-              </div>
-              <div class="mb-3">
-              <div class="form-check">
-                <input type="checkbox" class="form-check-input" id="dropdownCheck2">
-                <label class="form-check-label" for="dropdownCheck2">
-                Lembrar
-                </label>
-              </div>
-              </div>
-              <button type="submit" class="btn btn-primary">Logar</button>
-            </form>
-          <a href={{url_for( "cadastro" )}} class="btn btn-warning" type="button">Sign-up</a>
+		
+		<header class="p-3 mb-3 border-bottom bg-dark text-light">
+			<div class="visually-hidden visually-hidden-focusable col-12" id="barra_acessibilidade">
+				<ul  id="atalhos">
+				  <li><a href="#navbarNavAltMarkup" accesskey="1">Ir para menu [1]</a></li>
+				  <li><a href="#conteudo" accesskey="2">Ir para Conteudo principal [2]</a></li>
+				</ul>   
+			  </div>  
+			<div class="container">
+			  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+				<a class="navbar-brand" href={{url_for( "index" )}}>
+					<img src="/static/img/logo.png" alt="Logomarca do Site escrito BestTrade" width="67" height="33">
+			  	</a>
+		
+				<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+				  <li><a class="nav-link px-2 link-secondary" aria-current="page" href={{url_for( "index" )}}>Home<span class="visually-hidden">(Página atual)</span></a></li>
+				  <li><a class="nav-link px-2 link-light" href={{url_for( "anuncios" )}}>Anuncios</a></li>
+				  <li><a class="nav-link px-2 link-light" href={{url_for( "sobre" )}}>Sobre</a></li>
+				  {% if current_user.user_id == 4 %}
+				  <li class="nav-item dropdown">
+					<a class="nav-link px-2 link-light dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+					  Admin
+					</a>
+					<ul class="dropdown-menu">
+					  <li><a class="dropdown-item" href={{ url_for("cat_novo") }}>Categorias</a></li>
+					  <li><a class="dropdown-item" href={{ url_for("list_users") }}>Lista de Usuarios Cadastrados</a></li>
 
-          </div>
-        {% endif %}                 
-        </div>
-      </div>
-      </header>
+					  <li><hr class="dropdown-divider"></li>
+					  <li><a class="dropdown-item disabled" href="#">Menu Adminstrativo</a></li>
+					</ul>
+				  </li>
+				  {% endif %}
+				</ul>
+		
+				<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+					<input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
+				</form>
+				{% if current_user.is_authenticated %}
+				<div class="dropdown text-end">
+				  <a href="#" class="d-block link-light text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+					<img src="/static/img/icon.png" alt="mdo" width="60" height="60" class="rounded-circle">
+				  </a>
+				  <ul class="dropdown-menu text-small">
+					<li><a class="dropdown-item" id="bvindas"></a></li>
+					<li><a class="dropdown-item">{{name}}</a></li>
+					<li><hr class="dropdown-divider"></li>
+					<li><a class="dropdown-item" href={{ url_for("user_edit",id = current_user.user_id) }}><img src="/static/img/op.svg" alt="Engrenagem indicando a opção de sair" width="20" height="20">  Editar Perfil</a></li>
+					<li><a class="dropdown-item" href={{ url_for("meus_anuncios",id = current_user.user_id) }}><img src="/static/img/meus.svg" alt="Desenho de uma lista, representando seus anuncios" width="20" height="20">  Meus anuncios</a></li>
+					<li><a class="dropdown-item" href={{ url_for("novo_anuncio",id = current_user.user_id) }}><img src="/static/img/new.svg" alt="Desenho de um sinal de mais, representando criar novo anuncio" width="20" height="20">  Criar Anuncio</a></li>
+					<li><a class="dropdown-item" href={{ url_for("lista_favoritos",id = current_user.user_id) }}><img src="/static/img/fav.svg" alt="Coração, simbolizando a Lista de favoritos" width="20" height="20">  Favoritos</a></li>
+					<li><a class="dropdown-item" href={{ url_for("historico_compras",id = current_user.user_id) }}><img src="/static/img/comprados.svg" alt="Desenho de uma lista, representando suas compras" width="20" height="20">  Historico de Compras</a></li>
+					<li><a class="dropdown-item" href={{ url_for("historico_vendas",id = current_user.user_id) }}><img src="/static/img/vendidos.svg" alt="Desenho de uma lista, representando suas vendas" width="20" height="20">  Historico de Vendas</a></li>
+					<li><hr class="dropdown-divider"></li>
+					<li><a class="dropdown-item" href={{url_for( "logout" )}}><img src="/static/img/logout.png" alt="Porta com uma seta de sair" width="20" height="20">  Logout</a></li>
+				  </ul>
+				</div>
+				{% endif %}
+    			{% if not current_user.is_authenticated %}
+				<div class="text-end">
+						<button type="button" class="btn btn-outline-light me-2 dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+						  Login
+						</button>
+						<form class="dropdown-menu p-4" action="/login" method="post">
+						  <div class="mb-3">
+							<label for="email" class="form-label">Informe seu Email:</label>
+							<input type="email" class="form-control" id="email" name="email" placeholder="email@example.com">
+						</div>
+						  <div class="mb-3">
+							<label for="senha" class="form-label">Senha:</label>
+							<input type="password" class="form-control" id="senha" name="senha" placeholder="Password">
+						  </div>
+						  <div class="mb-3">
+							<div class="form-check">
+							  <input type="checkbox" class="form-check-input" id="dropdownCheck2">
+							  <label class="form-check-label" for="dropdownCheck2">
+								Lembrar
+							  </label>
+							</div>
+						  </div>
+						  <button type="submit" class="btn btn-primary">Logar</button>
+						</form>
+					<a href={{url_for( "cadastro" )}} class="btn btn-warning" type="button">Sign-up</a>
+
+					</div>
+				{% endif %}					        
+			  </div>
+			</div>
+		  </header>
 
     
       

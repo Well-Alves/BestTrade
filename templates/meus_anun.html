@@ -102,36 +102,51 @@
       
         
       <main class="container mx-center mt-1 w-90">
-        
-        <div class="alert alert-success" role="alert">
-            <h4 class="alert-heading">Compra Realizada com sucesso!</h4>
-            <hr>
-            <ul class="list-group list-group-vertical w-100">
-                <li class="list-group-item"><strong>Nome: </strong> {{ info.prod_nome }}</li>
-                <li class="list-group-item"><strong>Descrição: </strong> {{ info.descricao }}</li>
-                <li class="list-group-item"><strong>Quantidade: </strong> {{ qtd }} Unidades.</li>
-                <li class="list-group-item"><strong>Valor: </strong> R$: {{ info.valor }}  </li>
-                <li class="list-group-item"><strong></strong><hr></li>
-                <br>
-                <li class="list-group-item"><strong>Total: </strong> R$: {{ total }}  </li>
-            </ul>
-        </div>
-    </main>
-    <br>
-    <br>
-    <br>
-    <br>
-
-    <footer class="row bg-dark bg-gradient text-light text-start">
-  <div class="container mx-auto mt-1 w-90 col-12">
-    <p><br>&emsp; Copyright © 2022 - Wellington Alves</p>
-  </div>
-</footer>
-<script src="/static/js/script.js"></script>
-<script src="/static/js/bootstrap.bundle.js"></script>
-
-</body>
-</html>
-
-
-          
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Descrição</th>
+                    <th>Quantidade</th>
+                    <th>Valor</th>
+                    <th>Categoria</th>
+                    <th>Editar</th>
+                    <th>Deletar</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for anun in anuns %}
+                    {% if (anun.user_id == current_user.user_id) and (anun.prod_stt != 1) %}
+                        <tr>
+                            <td>{{ anun.prod_nome }}</td>
+                            <td>{{ anun.descricao }}</td>
+                            <td>{{ anun.qtd }}</td>
+                            <td>{{ anun.valor }}</td>
+                            {% for cat in cats %}
+                                {% if cat.cat_id == anun.cat_id_anun  %}
+                                    <td>{{ cat.cat_nome }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            <td><a href={{ url_for("anun_edit",id=anun.prod_id) }}><img src="/static/img/edit.png" alt="Imagem de um lapiz significando editar" title="Editar" width="25" height="25"></a></td>
+                            <td><a href={{ url_for("anun_del",id=anun.prod_id) }}><img src="/static/img/del.png" alt="Imagem de uma borracha significando Apagar/Deletar" title="Deletar" width="25" height="25"></a></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>      
+      </main>
+      <br>
+      <br>
+      <br>
+      <br>
+  
+      <footer class="row bg-dark bg-gradient text-light text-start">
+    <div class="container mx-auto mt-1 w-90 col-12">
+      <p><br>&emsp; Copyright © 2022 - Wellington Alves</p>
+    </div>
+  </footer>
+  <script src="/static/js/script.js"></script>
+  <script src="/static/js/bootstrap.bundle.js"></script>
+  
+  </body>
+  </html>
