@@ -98,53 +98,44 @@
 			</div>
 		  </header>
 
-    
-      
-        
-      <main class="container mx-center mt-1 w-90">
-        
-        <div><h2>Dados da Compra</h2></div>
+  	
+			<main class="container mx-auto mt-1 w-90" id="conteudo">
+				<div class="text-center">
+					<br><br>
+					<h3 class="text-center">BestTrade</h3>
+					<br>
+					<hr>
+					<br>
+					<p>Este é um projeto de sistema completamente construido por mim (Wellington Alves) para o trabalho da disciplina de "FRAMEWORKS PARA DESENVOLVIMENTO DE SOFTWARE", 
+                        administrada pelo Prof. Dr. Diogo Branquinho Ramos do curso de Analise e desenvolvimento de Sistemas da Toledo-Prudente, este projeto visa atender os pre-requisitos
+                        que foram passados na materia:</p>
+                    <br>
+                        <p>O sistema possui diversos usuários, que podem anunciar ou comprar produtos;</p>
+                        <p>Cada usuário possui diversos anúncios;</p>
+                        <p>Os anúncios estão organizados em categorias;</p>
+                        <p>Os usuários podem realizar perguntas nos anúncios;</p>
+                        <p>O usuário proprietário do anúncio pode responder uma pergunta;</p>
+                        <p>Os usuários podem realizar compras de um anúncio (não existe carrinho de compras);</p>
+                        <p>Os usuários podem criar listas de anúncios favoritos;</p>
+                        <p>Os usuários podem consultar o seu relatório de vendas;</p>
+                        <p>Os usuários podem consultar o seu relatório de compras.</p>
+                        <br>
+                        <br>
+            
+					<p>Este é apenas um sistema lúdico e não está finalizado ou otimizado, sendo apenas um esboço para a materia, ainda faltando revisões de segurança 
+                        dentre outros aspectos.
+                    </p>
+                    <p>Este projeto pode ser encontrado no meu <a class="edit" href="https://github.com/Well-Alves/BestTrade/" target="_blank" title="GitHub Wellington Alves, projeto BestTrade">repositorio pessoal do GitHub</a> estando como Público</p>
 
-        <hr>
-        
-        <div class="alert alert-warning" role="alert">
-            <ul class="list-group list-group-vertical  w-100">
-                <li class="list-group-item"><strong>Nome: </strong> {{ info.prod_nome }}</li>
-                <li class="list-group-item"><strong>Descrição: </strong> {{ info.descricao }}</li>
-                <li class="list-group-item"><strong>Quantidade: </strong> {{ qtd }} Unidades.</li>
-                <li class="list-group-item"><strong>Valor: </strong> R$: {{ info.valor }}  </li>
-                <li class="list-group-item"><strong></strong><hr></li>
-                <br>
-                <li class="list-group-item"><strong>Total: </strong> R$: {{ total }}  </li>
-            </ul>
-        </div>
-        <div mb-3>
-            <form class="form-inline" action="/anuncio/compra/confirma" method="post">
-              <label for="prod_id" class="form-label"></label>
-              <input type="hidden" name="prod_id" value={{info.prod_id}}>
-              <label for="v_id" class="form-label"></label>
-              <input type="hidden" name="v_id" value={{info.user_id}}>
-              <label for="total_t" class="form-label"></label>
-              <input type="hidden" name="total_t" value={{total}}> 
-                <button type="submit" class="btn btn-outline-danger mb-2"  name="qtd" value={{qtd}}>Comprar</button>
-            </form>
-            <a href={{url_for( "anuncios" )}} class="btn btn-warning" type="button">Cancelar</a>
-        </div>
-      </main>
-      <br>
-      <br>
-      <br>
-      <br>
-  
-      <footer class="row bg-dark bg-gradient text-light text-start">
-    <div class="container mx-auto mt-1 w-90 col-12">
-      <p><br>&emsp; Copyright © 2022 - Wellington Alves</p>
-    </div>
-  </footer>
-  <script src="/static/js/script.js"></script>
-  <script src="/static/js/bootstrap.bundle.js"></script>
-  
+				</div>
+			</main>
+			<footer class="row bg-dark bg-gradient text-light text-start">
+	      <div class="container mx-auto mt-1 w-90 col-12">
+	        <p><br>&emsp; Copyright © 2022 - Wellington Alves</p>
+	      </div>
+	    </footer>
+	    <script src="/static/js/script.js"></script>
+	    <script src="/static/js/bootstrap.bundle.js"></script>
+		
   </body>
-  </html>
-
-          
+</html>

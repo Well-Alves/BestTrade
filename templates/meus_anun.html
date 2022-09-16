@@ -120,7 +120,7 @@
                         <tr>
                             <td>{{ anun.prod_nome }}</td>
                             <td>{{ anun.descricao }}</td>
-                            <td>{{ anun.qtd }}</td>
+                            <td>{{ anun.qtd }} {% if anun.qtd == 0 %} - (Esgotado) {% endif %}</td>
                             <td>{{ anun.valor }}</td>
                             {% for cat in cats %}
                                 {% if cat.cat_id == anun.cat_id_anun  %}

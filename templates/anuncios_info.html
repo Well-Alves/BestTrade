@@ -160,14 +160,16 @@
               </div>
             </div>
             <br>
-            <div>
-              <a class="btn btn-primary mb-2" data-bs-toggle="modal" href="#exampleModalToggle" role="button">Comprar</a>
+            <div class="row justify-content-start">
+              <div class="col-auto"><a class="btn btn-primary mb-2" data-bs-toggle="modal" href="#exampleModalToggle" role="button">Comprar</a></div>
               {% if stt == 1 %}
-                <form class="form-inline" action="/anuncio/favoritos/novo" method="post">
-                  <button type="submit" class="btn btn-outline-danger mb-2"  name="fav" value={{info.prod_id}}>Favoritar</button>
-                </form>
+                <div class="col-auto">
+                  <form class="form-inline" action="/anuncio/favoritos/novo" method="post">
+                    <button type="submit" class="btn btn-outline-danger mb-2"  name="fav" value={{info.prod_id}}>Favoritar</button>
+                  </form>
+                </div>
               {% else %}
-                    <button type="button" class="btn btn-outline-danger mb-2"  name="fav" value={{info.prod_id}} disabled>Favoritar</button>
+                <div class="col-auto"><button type="button" class="btn btn-outline-danger mb-2"  name="fav" value={{info.prod_id}} disabled>Favoritar</button></div>
               {% endif %}
             </div>
         </main>

@@ -113,12 +113,16 @@ class Transacao(db.Model):
     vendedor_id = db.Column("v_id", db.ForeignKey("produto.user_id"), nullable=False)
     comprador_id = db.Column("c_id", db.ForeignKey("usuario.user_id"), nullable=False)
     data_trade = db.Column("d_trade", db.DateTime)
+    qtd_t = db.Column("qtd_t", db.Integer, nullable=False)
+    total_t = db.Column("total_t", db.Float, nullable=False)
 
-    def __init__(self, anun_id, vendedor_id, comprador_id, data_trade):
+    def __init__(self, anun_id, vendedor_id, comprador_id, data_trade, qtd_t, total_t):
         self.anun_id = anun_id
         self.vendedor_id = vendedor_id
         self.comprador_id = comprador_id
         self.data_trade = data_trade
+        self.qtd_t = qtd_t
+        self.total_t = total_t
 
 class Mensagens(db.Model):
     __tablename__ = "mensagens"
@@ -275,17 +279,17 @@ def anun_edit():
 @app.route("/usuario/favoritos/lista")
 @login_required
 def lista_favoritos():
-    return render_template("favoritos.html")  
+    return render_template("favoritos.html", cats = Categoria.query.all(), favs = Favoritos.query.all(), anuns = Produto.query.all(), titulo = "Meus Favoritos")  
 
 @app.route("/hist/compras")
 @login_required 
 def historico_compras():
-    return render_template("hist_compras.html") 
+    return render_template("hist_compras.html", trades = Transacao.query.all(), anuns = Produto.query.all(), vends = Usuario.query.all(), titulo = "Historico de Compras" ) 
 
 @app.route("/hist/vendas")
 @login_required
 def historico_vendas():
-    return render_template("hist_vendas.html")
+    return render_template("hist_vendas.html", trades = Transacao.query.all(), anuns = Produto.query.all(), vends = Usuario.query.all(), titulo = "Historico de Vendas" )
 
 @app.route("/usuario/novo/criar", methods=['POST'])
 def cad_user():
@@ -300,7 +304,7 @@ def cad_user():
 def cad_novo_anun():
     user_id = current_user.user_id
     dat = datetime.today().strftime("%Y-%m-%d %H:%M:%S")
-    novo_anun = Produto(request.form.get("prod_nome"), request.form.get("descricao"), request.form.get("qtd"), request.form.get("valor"), request.form.get("cat_id_anun"), user_id, dat)
+    novo_anun = Produto(request.form.get("prod_nome"), request.form.get("descricao"), request.form.get("qtd"), request.form.get("valor"), request.form.get("cat_id_anun"), user_id, dat, 0)
     db.session.add(novo_anun)
     db.session.commit()
     return redirect(url_for("novo_anuncio"))
@@ -341,7 +345,7 @@ def novo_fav():
 
 @app.route("/sobre")
 def sobre():
-    return render_template("sobre.html") 
+    return render_template("sobre.html", titulo = "informações") 
 
 @app.route("/anuncio/compra", methods=["POST"])
 @login_required
@@ -361,7 +365,7 @@ def comprado():
     dat = datetime.today().strftime('%Y-%m-%d %H:%M:%S')
     v_id = request.form.get("v_id")
     print(v_id)
-    trade = Transacao(request.form.get("prod_id"), request.form.get("v_id"), comprador, dat)
+    trade = Transacao(request.form.get("prod_id"), request.form.get("v_id"), comprador, dat, request.form.get("qtd"), request.form.get("total_t"))
     db.session.add(trade)
     db.session.commit()
     qtd = int(request.form.get("qtd"))
@@ -373,10 +377,14 @@ def comprado():
     total = aux.valor * qtd
     return render_template("comprado.html", info = aux, qtd = qtd, total = total, titulo = "Compra realizada")
 
-@app.route("/favorito")
+@app.route("/anuncio/favoritos/del/<int:id>")
 @login_required
-def fav():
-    return
+def fav_del(id):
+    fav = Favoritos.query.get(id)
+    db.session.delete(fav)
+    db.session.commit()
+    return redirect(url_for('lista_favoritos'))
+    
 
 
 @app.route("/busca")

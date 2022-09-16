@@ -102,34 +102,42 @@
       
         
       <main class="container mx-center mt-1 w-90">
-        
-        <div><h2>Dados da Compra</h2></div>
-
+        <h3 class="text-center">Historico de Compras</h3>
+        <br>
         <hr>
-        
-        <div class="alert alert-warning" role="alert">
-            <ul class="list-group list-group-vertical  w-100">
-                <li class="list-group-item"><strong>Nome: </strong> {{ info.prod_nome }}</li>
-                <li class="list-group-item"><strong>Descrição: </strong> {{ info.descricao }}</li>
-                <li class="list-group-item"><strong>Quantidade: </strong> {{ qtd }} Unidades.</li>
-                <li class="list-group-item"><strong>Valor: </strong> R$: {{ info.valor }}  </li>
-                <li class="list-group-item"><strong></strong><hr></li>
-                <br>
-                <li class="list-group-item"><strong>Total: </strong> R$: {{ total }}  </li>
-            </ul>
-        </div>
-        <div mb-3>
-            <form class="form-inline" action="/anuncio/compra/confirma" method="post">
-              <label for="prod_id" class="form-label"></label>
-              <input type="hidden" name="prod_id" value={{info.prod_id}}>
-              <label for="v_id" class="form-label"></label>
-              <input type="hidden" name="v_id" value={{info.user_id}}>
-              <label for="total_t" class="form-label"></label>
-              <input type="hidden" name="total_t" value={{total}}> 
-                <button type="submit" class="btn btn-outline-danger mb-2"  name="qtd" value={{qtd}}>Comprar</button>
-            </form>
-            <a href={{url_for( "anuncios" )}} class="btn btn-warning" type="button">Cancelar</a>
-        </div>
+        <br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Vendedor</th>
+                    <th>Quantidade</th>
+                    <th>Valor Total</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for trade in trades %}
+                    {% if trade.comprador_id == current_user.user_id %}
+                        {% for anun in anuns %}
+                            {% if trade.anun_id == anun.prod_id %}
+                                <tr>
+                                    <td><a href={{ url_for("anun_info",id=anun.prod_id) }}>{{ anun.prod_nome }}</a></td>
+                            {% endif %}
+                        {% endfor %}
+                        {% for vend in vends %}
+                            {% if vend.user_id == trade.vendedor_id %}
+                                    <td>{{ vend.user_nome }}</td>
+                            {% endif %}
+                        {% endfor %}
+                                    <td>{{ trade.qtd_t }}</td>
+                                    <td>{{ trade.total_t }}</td>
+                                    <td>{{ trade.data_trade }}</td>
+                                </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>      
       </main>
       <br>
       <br>
@@ -146,5 +154,3 @@
   
   </body>
   </html>
-
-          

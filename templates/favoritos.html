@@ -102,34 +102,35 @@
       
         
       <main class="container mx-center mt-1 w-90">
-        
-        <div><h2>Dados da Compra</h2></div>
-
+        <h3 class="text-center">Lista de Favoritos</h3>
+        <p class="text-secondary">Produtos removidos ou esgotados não irão aparecer na lista</p>
+        <br>
         <hr>
-        
-        <div class="alert alert-warning" role="alert">
-            <ul class="list-group list-group-vertical  w-100">
-                <li class="list-group-item"><strong>Nome: </strong> {{ info.prod_nome }}</li>
-                <li class="list-group-item"><strong>Descrição: </strong> {{ info.descricao }}</li>
-                <li class="list-group-item"><strong>Quantidade: </strong> {{ qtd }} Unidades.</li>
-                <li class="list-group-item"><strong>Valor: </strong> R$: {{ info.valor }}  </li>
-                <li class="list-group-item"><strong></strong><hr></li>
-                <br>
-                <li class="list-group-item"><strong>Total: </strong> R$: {{ total }}  </li>
-            </ul>
-        </div>
-        <div mb-3>
-            <form class="form-inline" action="/anuncio/compra/confirma" method="post">
-              <label for="prod_id" class="form-label"></label>
-              <input type="hidden" name="prod_id" value={{info.prod_id}}>
-              <label for="v_id" class="form-label"></label>
-              <input type="hidden" name="v_id" value={{info.user_id}}>
-              <label for="total_t" class="form-label"></label>
-              <input type="hidden" name="total_t" value={{total}}> 
-                <button type="submit" class="btn btn-outline-danger mb-2"  name="qtd" value={{qtd}}>Comprar</button>
-            </form>
-            <a href={{url_for( "anuncios" )}} class="btn btn-warning" type="button">Cancelar</a>
-        </div>
+        <br>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Valor</th>
+                    <th>Remover</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for fav in favs %}
+                    {% if fav.fav_user ==  current_user.user_id %}
+                        {% for anun in anuns %}
+                            {% if (fav.fav_anun == anun.prod_id) and (anun.prod_stt != 1) and (anun.qtd >= 1) %}
+                                <tr>
+                                    <td><a href={{ url_for("anun_info",id=anun.prod_id) }}>{{ anun.prod_nome }}</a></td>
+                                    <td>{{ anun.valor }}</td>
+                                    <td><a href={{ url_for("fav_del",id=fav.fav_id) }}><img src="/static/img/del-fav.svg" alt="Imagem de um coração com o simbolo de -(menos), significando Apagar/Deletar" title="Remover Favorito" width="25" height="25"></a></td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>      
       </main>
       <br>
       <br>
@@ -146,5 +147,3 @@
   
   </body>
   </html>
-
-          
